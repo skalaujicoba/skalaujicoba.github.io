@@ -38,6 +38,8 @@
 	<meta name="msapplication-TileColor" content="#fff">
 	<meta name="theme-color" content="#fff">
 	<!-- Preload -->
+	<link rel="preload" as="script" href="https://code.jquery.com/jquery-3.6.3.slim.min.js">
+	<link rel="preload" as="script" href="https://cdn.jsdelivr.net/npm/jquery-csv@1.0.21/src/jquery.csv.min.js">
 	<link rel="preload" as="style" href="main.min.css">
 	<!-- Main -->
 	<link rel="stylesheet" href="main.min.css">
@@ -52,6 +54,12 @@
 		<div class="h-screen max-md:overflow-auto max-md:pb-[6.7rem]">
 			<div class="flex flex-col items-center justify-center min-h-full p-7">
 				<div class="w-full max-w-[525px]">
+
+					<div class="fixed top-0 bottom-0 right-0 left-0 z-10 w-full h-full flex items-center justify-center bg-white" id="preload">
+						<div class="loading dark active">
+							<img src="loading.svg" width="24" height="24" alt="loading" loading="lazy">
+						</div>
+					</div>
 
 					<form spellcheck="false" class="mb-8" name="kuesioner">
 
@@ -1326,6 +1334,8 @@
 </main>
 
 <slot>
+	<script src="https://code.jquery.com/jquery-3.6.3.slim.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/jquery-csv@1.0.21/src/jquery.csv.min.js"></script>
 	<script>
 		function navigate(prev,next) {
 			document.querySelectorAll(prev).forEach(trigger => {
@@ -1434,8 +1444,8 @@
 
 		function form(name) {
 			document.querySelectorAll('[name="' + name + '"]').forEach(form => {
-				// let gsKuesioner = 'https://script.google.com/macros/s/AKfycbyYHJW8iSy0kYqJi7g_G1AAiikjwmsEOOFRkmQsei_2oKweFJ8euZ9JE6FX43l4VmCCzg/exec'
-				let urlKuesioner = atob('aHR0cHM6Ly9zY3JpcHQuZ29vZ2xlLmNvbS9tYWNyb3Mvcy9BS2Z5Y2J5WUhKVzhpU3kwa1lxSmk3Z19HMUFBaWlrandtc0VPT0ZSa21Rc2VpXzJvS3dlRko4ZXVaOUpFNkZYNDNsNFZtQ0N6Zy9leGVj')
+				// let gs = 'https://script.google.com/macros/s/AKfycbyYHJW8iSy0kYqJi7g_G1AAiikjwmsEOOFRkmQsei_2oKweFJ8euZ9JE6FX43l4VmCCzg/exec'
+				let url = atob('aHR0cHM6Ly9zY3JpcHQuZ29vZ2xlLmNvbS9tYWNyb3Mvcy9BS2Z5Y2J5WUhKVzhpU3kwa1lxSmk3Z19HMUFBaWlrandtc0VPT0ZSa21Rc2VpXzJvS3dlRko4ZXVaOUpFNkZYNDNsNFZtQ0N6Zy9leGVj')
 					form = document.forms[name]
 					submit = form.querySelector('[type="submit"]')
 					loading = form.querySelector('[type="submit"] .loading')
@@ -1447,7 +1457,7 @@
 					submit.setAttribute('disabled','disabled')
 					loading.classList.add('active')
 
-					fetch(urlKuesioner, {
+					fetch(url, {
 						method: 'post',
 						body: new FormData(form)
 					}).then(response => {
@@ -1479,30 +1489,72 @@
 		}
 		repeat('#restart button','#start')
 
+		function questionCount(parent,child,target) {
+			document.querySelectorAll(parent).forEach(item => {
+				let total = item.querySelectorAll(child).length
+				item.setAttribute('data-question',total)
+				if ( target !== '' ) item.querySelector(target).innerHTML = total
+			})
+		}
+		questionCount('#start','fieldset','')
+		questionCount('#form-1','.card','p:first-of-type span')
+		questionCount('#form-2','.card','p:first-of-type span')
+		questionCount('#form-3','.card','p:first-of-type span')
+		questionCount('#form-4','.card','p:first-of-type span')
+
+		function chunkArrayInGroups(arr, size) {
+			var myArray = []
+			for(var i = 0; i < arr.length; i += size) {
+				myArray.push(arr.slice(i, i+size))
+			}
+			return myArray
+		}
+
+		function parseQuestion(selector,source) {
+			document.querySelectorAll(selector).forEach((item,index) => {
+				item.innerHTML = source[index]
+			})
+		}
+
 		async function question(url) {
 			try {
-				const target = url
+				var target = url
 
-				const res = await fetch(target, {
+				var response = await fetch(target, {
 					method: 'get',
 					headers: {
 						'content-type': 'text/csv;charset=UTF-8',
 					}
 				})
 
-				if (res.status === 200) {
-					const data = await res.text()
-					console.log(data)
+				if ( response.status === 200 ) {
+					let data = await response.text()
+					let question = $.csv.toArrays(data)[0]
+					let attr = 'data-question'
+					question.shift()
+
+					let start = chunkArrayInGroups(question,document.querySelector('#start').getAttribute(attr))
+					let form1 = chunkArrayInGroups(start[1],document.querySelector('#form-1').getAttribute(attr))
+					let form2 = chunkArrayInGroups(form1[1],document.querySelector('#form-2').getAttribute(attr))
+					let form3 = chunkArrayInGroups(form2[1],document.querySelector('#form-3').getAttribute(attr))
+					let form4 = chunkArrayInGroups(form3[1],document.querySelector('#form-4').getAttribute(attr))
+
+					parseQuestion('#form-1 .card h3',form1[0])
+					parseQuestion('#form-2 .card h3',form2[0])
+					parseQuestion('#form-3 .card h3',form3[0])
+					parseQuestion('#form-4 .card h3',form4[0])
+
+					document.getElementById('preload').classList.add('hidden')
 				} else {
-					console.log(`Error code ${res.status}`)
+					console.log(`Error code ${response.status}`)
 				}
-			} catch (err) {
-				console.log(err)
+			} catch (error) {
+				console.log(error)
 			}
 		}
-		// let shUrl = 'https://docs.google.com/spreadsheets/d/1jcSB8wmnaJXAZD3rW-GXdursX6qhCKA2mmFlJoTPoeU/gviz/tq?tqx=out:csv&sheet=Data'
-		let shUrl = atob('aHR0cHM6Ly9kb2NzLmdvb2dsZS5jb20vc3ByZWFkc2hlZXRzL2QvMWpjU0I4d21uYUpYQVpEM3JXLUdYZHVyc1g2cWhDS0EybW1GbEpvVFBvZVUvZ3Zpei90cT90cXg9b3V0OmNzdiZzaGVldD1EYXRh')
-		question(shUrl)
+		// let pertanyaan = 'https://docs.google.com/spreadsheets/d/1jcSB8wmnaJXAZD3rW-GXdursX6qhCKA2mmFlJoTPoeU/gviz/tq?tqx=out:csv&sheet=Data'
+		let pertanyaan = atob('aHR0cHM6Ly9kb2NzLmdvb2dsZS5jb20vc3ByZWFkc2hlZXRzL2QvMWpjU0I4d21uYUpYQVpEM3JXLUdYZHVyc1g2cWhDS0EybW1GbEpvVFBvZVUvZ3Zpei90cT90cXg9b3V0OmNzdiZzaGVldD1EYXRh')
+		question('https://cors-anywhere.herokuapp.com/' + pertanyaan)
 	</script>
 </slot>
 
