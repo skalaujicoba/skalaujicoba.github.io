@@ -1469,7 +1469,7 @@
 		}
 		form('kuesioner')
 
-		function restart(trigger,target) {
+		function repeat(trigger,target) {
 			document.querySelectorAll(trigger).forEach(item => {
 				item.addEventListener('click', (e) => {
 					e.target.closest('section').classList.add('hidden')
@@ -1477,7 +1477,7 @@
 				})
 			})
 		}
-		restart('#restart button','#start')
+		repeat('#restart button','#start')
 	</script>
 </slot>
 
