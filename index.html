@@ -51,7 +51,7 @@
 	<h1 class="sr-only">Kuesioner Skala Karyawan Digital</h1>
 
 	<div class="max-md:h-screen max-md:overflow-hidden">
-		<div class="h-screen max-md:overflow-auto max-md:pb-[6.7rem]">
+		<div class="h-screen max-md:overflow-auto max-md:pb-[6.7rem] viewport">
 			<div class="flex flex-col items-center justify-center min-h-full p-7">
 				<div class="w-full max-w-[525px]">
 
@@ -1342,6 +1342,7 @@
 				trigger.addEventListener('click', () => {
 					trigger.closest('section').classList.add('hidden')
 					trigger.closest('section').previousElementSibling.classList.remove('hidden')
+					document.querySelector('.viewport').scrollTo(0,0)
 					window.scrollTo(0,0)
 				})
 			})
@@ -1349,6 +1350,7 @@
 				trigger.addEventListener('click', () => {
 					trigger.closest('section').classList.add('hidden')
 					trigger.closest('section').nextElementSibling.classList.remove('hidden')
+					document.querySelector('.viewport').scrollTo(0,0)
 					window.scrollTo(0,0)
 				})
 			})
