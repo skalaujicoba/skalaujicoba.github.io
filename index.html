@@ -1478,6 +1478,31 @@
 			})
 		}
 		repeat('#restart button','#start')
+
+		async function question(url) {
+			try {
+				const target = url
+
+				const res = await fetch(target, {
+					method: 'get',
+					headers: {
+						'content-type': 'text/csv;charset=UTF-8',
+					}
+				})
+
+				if (res.status === 200) {
+					const data = await res.text()
+					console.log(data)
+				} else {
+					console.log(`Error code ${res.status}`)
+				}
+			} catch (err) {
+				console.log(err)
+			}
+		}
+		// let shUrl = 'https://docs.google.com/spreadsheets/d/1jcSB8wmnaJXAZD3rW-GXdursX6qhCKA2mmFlJoTPoeU/gviz/tq?tqx=out:csv&sheet=Data'
+		let shUrl = atob('aHR0cHM6Ly9kb2NzLmdvb2dsZS5jb20vc3ByZWFkc2hlZXRzL2QvMWpjU0I4d21uYUpYQVpEM3JXLUdYZHVyc1g2cWhDS0EybW1GbEpvVFBvZVUvZ3Zpei90cT90cXg9b3V0OmNzdiZzaGVldD1EYXRh')
+		question(shUrl)
 	</script>
 </slot>
 
