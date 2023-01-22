@@ -1337,12 +1337,14 @@
 	<script src="https://code.jquery.com/jquery-3.6.3.slim.min.js"></script>
 	<script src="https://cdn.jsdelivr.net/npm/jquery-csv@1.0.21/src/jquery.csv.min.js"></script>
 	<script>
+		const viewport = document.querySelector('.viewport')
+
 		function navigate(prev,next) {
 			document.querySelectorAll(prev).forEach(trigger => {
 				trigger.addEventListener('click', () => {
 					trigger.closest('section').classList.add('hidden')
 					trigger.closest('section').previousElementSibling.classList.remove('hidden')
-					document.querySelector('.viewport').scrollTo(0,0)
+					viewport.scrollTo(0,0)
 					window.scrollTo(0,0)
 				})
 			})
@@ -1350,7 +1352,7 @@
 				trigger.addEventListener('click', () => {
 					trigger.closest('section').classList.add('hidden')
 					trigger.closest('section').nextElementSibling.classList.remove('hidden')
-					document.querySelector('.viewport').scrollTo(0,0)
+					viewport.scrollTo(0,0)
 					window.scrollTo(0,0)
 				})
 			})
@@ -1469,6 +1471,8 @@
 							loading.classList.remove('active')
 							submit.closest('section').classList.add('hidden')
 							restart.classList.remove('hidden')
+							viewport.scrollTo(0,0)
+							window.scrollTo(0,0)
 						},500)
 						form.reset()
 					}).catch(error => {
@@ -1486,6 +1490,8 @@
 				item.addEventListener('click', (e) => {
 					e.target.closest('section').classList.add('hidden')
 					document.querySelector(target).classList.remove('hidden')
+					viewport.scrollTo(0,0)
+					window.scrollTo(0,0)
 				})
 			})
 		}
@@ -1547,6 +1553,9 @@
 					parseQuestion('#form-4 .card h3',form4[0])
 
 					document.getElementById('preload').classList.add('hidden')
+
+					viewport.scrollTo(0,0)
+					window.scrollTo(0,0)
 				} else {
 					console.log(`Error code ${response.status}`)
 				}
