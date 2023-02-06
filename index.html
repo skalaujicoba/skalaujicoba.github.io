@@ -38,7 +38,7 @@
 	<meta name="msapplication-TileColor" content="#fff">
 	<meta name="theme-color" content="#fff">
 	<!-- Preload -->
-	<link rel="preload" as="script" href="https://code.jquery.com/jquery-3.6.3.slim.min.js">
+	<link rel="preload" as="script" href="https://code.jquery.com/jquery-3.6.3.min.js">
 	<link rel="preload" as="script" href="https://cdn.jsdelivr.net/npm/jquery-csv@1.0.21/src/jquery.csv.min.js">
 	<link rel="preload" as="style" href="main.min.css">
 	<!-- Main -->
@@ -1334,7 +1334,7 @@
 </main>
 
 <slot>
-	<script src="https://code.jquery.com/jquery-3.6.3.slim.min.js"></script>
+	<script src="https://code.jquery.com/jquery-3.6.3.min.js"></script>
 	<script src="https://cdn.jsdelivr.net/npm/jquery-csv@1.0.21/src/jquery.csv.min.js"></script>
 	<script>
 		const viewport = document.querySelector('.viewport')
@@ -1524,48 +1524,79 @@
 			})
 		}
 
-		async function question(url) {
-			try {
-				var target = url
-
-				var response = await fetch(target, {
-					method: 'get',
-					headers: {
-						'content-type': 'text/csv;charset=UTF-8',
-					}
-				})
-
-				if ( response.status === 200 ) {
-					let data = await response.text()
-					let question = $.csv.toArrays(data)[0]
-					let attr = 'data-question'
-					question.shift()
-
-					let start = chunkArrayInGroups(question,document.querySelector('#start').getAttribute(attr))
-					let form1 = chunkArrayInGroups(start[1],document.querySelector('#form-1').getAttribute(attr))
-					let form2 = chunkArrayInGroups(form1[1],document.querySelector('#form-2').getAttribute(attr))
-					let form3 = chunkArrayInGroups(form2[1],document.querySelector('#form-3').getAttribute(attr))
-					let form4 = chunkArrayInGroups(form3[1],document.querySelector('#form-4').getAttribute(attr))
-
-					parseQuestion('#form-1 .card h3',form1[0])
-					parseQuestion('#form-2 .card h3',form2[0])
-					parseQuestion('#form-3 .card h3',form3[0])
-					parseQuestion('#form-4 .card h3',form4[0])
-
-					document.getElementById('preload').classList.add('hidden')
-
-					viewport.scrollTo(0,0)
-					window.scrollTo(0,0)
-				} else {
-					console.log(`Error code ${response.status}`)
-				}
-			} catch (error) {
-				console.log(error)
-			}
-		}
 		// let pertanyaan = 'https://docs.google.com/spreadsheets/d/1jcSB8wmnaJXAZD3rW-GXdursX6qhCKA2mmFlJoTPoeU/gviz/tq?tqx=out:csv&sheet=Data'
 		let pertanyaan = atob('aHR0cHM6Ly9kb2NzLmdvb2dsZS5jb20vc3ByZWFkc2hlZXRzL2QvMWpjU0I4d21uYUpYQVpEM3JXLUdYZHVyc1g2cWhDS0EybW1GbEpvVFBvZVUvZ3Zpei90cT90cXg9b3V0OmNzdiZzaGVldD1EYXRh')
-		question('https://cors-anywhere.herokuapp.com/' + pertanyaan)
+		$.ajax({
+			type: 'get',
+			url: pertanyaan,
+			success: function(data) {
+				let question = $.csv.toArrays(data)[0]
+				let attr = 'data-question'
+				question.shift()
+
+				let start = chunkArrayInGroups(question,document.querySelector('#start').getAttribute(attr))
+				let form1 = chunkArrayInGroups(start[1],document.querySelector('#form-1').getAttribute(attr))
+				let form2 = chunkArrayInGroups(form1[1],document.querySelector('#form-2').getAttribute(attr))
+				let form3 = chunkArrayInGroups(form2[1],document.querySelector('#form-3').getAttribute(attr))
+				let form4 = chunkArrayInGroups(form3[1],document.querySelector('#form-4').getAttribute(attr))
+
+				parseQuestion('#form-1 .card h3',form1[0])
+				parseQuestion('#form-2 .card h3',form2[0])
+				parseQuestion('#form-3 .card h3',form3[0])
+				parseQuestion('#form-4 .card h3',form4[0])
+
+				document.getElementById('preload').classList.add('hidden')
+
+				viewport.scrollTo(0,0)
+				window.scrollTo(0,0)
+			},
+			error: function(error) {
+				console.log(error.statusText)
+			}
+		})
+
+		// async function question(url) {
+		// 	try {
+		// 		var target = url
+
+		// 		var response = await fetch(target, {
+		// 			method: 'get',
+		// 			headers: {
+		// 				'content-type': 'text/csv;charset=UTF-8',
+		// 			}
+		// 		})
+
+		// 		if ( response.status === 200 ) {
+		// 			let data = await response.text()
+		// 			let question = $.csv.toArrays(data)[0]
+		// 			let attr = 'data-question'
+		// 			question.shift()
+
+		// 			let start = chunkArrayInGroups(question,document.querySelector('#start').getAttribute(attr))
+		// 			let form1 = chunkArrayInGroups(start[1],document.querySelector('#form-1').getAttribute(attr))
+		// 			let form2 = chunkArrayInGroups(form1[1],document.querySelector('#form-2').getAttribute(attr))
+		// 			let form3 = chunkArrayInGroups(form2[1],document.querySelector('#form-3').getAttribute(attr))
+		// 			let form4 = chunkArrayInGroups(form3[1],document.querySelector('#form-4').getAttribute(attr))
+
+		// 			parseQuestion('#form-1 .card h3',form1[0])
+		// 			parseQuestion('#form-2 .card h3',form2[0])
+		// 			parseQuestion('#form-3 .card h3',form3[0])
+		// 			parseQuestion('#form-4 .card h3',form4[0])
+
+		// 			document.getElementById('preload').classList.add('hidden')
+
+		// 			viewport.scrollTo(0,0)
+		// 			window.scrollTo(0,0)
+		// 		} else {
+		// 			console.log(`Error code ${response.status}`)
+		// 		}
+		// 	} catch (error) {
+		// 		console.log(error)
+		// 	}
+		// }
+		// // let pertanyaan = 'https://docs.google.com/spreadsheets/d/1jcSB8wmnaJXAZD3rW-GXdursX6qhCKA2mmFlJoTPoeU/gviz/tq?tqx=out:csv&sheet=Data'
+		// let pertanyaan = atob('aHR0cHM6Ly9kb2NzLmdvb2dsZS5jb20vc3ByZWFkc2hlZXRzL2QvMWpjU0I4d21uYUpYQVpEM3JXLUdYZHVyc1g2cWhDS0EybW1GbEpvVFBvZVUvZ3Zpei90cT90cXg9b3V0OmNzdiZzaGVldD1EYXRh')
+		// question('https://cors-anywhere.herokuapp.com/' + pertanyaan)
 	</script>
 </slot>
 
